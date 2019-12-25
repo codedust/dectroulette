@@ -1,7 +1,7 @@
 {
   "name": "DECTroulette",
   "short_name": "DECTroulette",
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#222222",
   "description": "DECTroulette let's you get in contact with other DECT users at congress.",

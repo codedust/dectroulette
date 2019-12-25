@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DECTroulette</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <section>
+    <img class="logo" src="static/dectroulette.svg">
+    <h1>Let's talk!</h1>
+    <p>You're now registered to <span class="brand">DECTroulette</span>. Let's have a chat with someone else!</p>
+
+    {% if error %}
+    <p class="error">ERROR: {{ error }}!</p>
+    {% endif %}
+
+    <p>Here's the next DECT number you could call:</p>
+
+    <p class="dectnumber">{{ partner_number }}</p>
+    <input type="submit" onClick="window.location.reload();" value="Next number">
+
+    {% if priority %}
+    <p>You're in the priority queue and will be called soon.<p>
+    {% endif %}
+
+    {% if active_users == 1 %}
+    <p class="error">You are the only registered user for DECTroulette right now.<p>
+    {% else %}
+    <p>There are currently {{ active_users }} registered users at <span class="brand">DECTroulette</span>.</p>
+    {% endif %}
+
+    <p><a href="/unregister?d={{own_number}}">Unregister</a></p>
+  </section>
+  <footer>
+    Footer!
+  </footer>
+</body>
+</html>

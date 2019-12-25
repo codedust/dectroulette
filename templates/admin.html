@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DECTroulette</title>
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <section>
+    <img class="logo" src="static/dectroulette.svg">
+    <h1>Admin console</h1>
+
+    {% if error %}
+    <p class="error">ERROR: {{ error }}!</p>
+    {% endif %}
+
+    <h2>Banned numbers</h2>
+    <p>Banned numbers: {{ banned_numbers }}</p>
+    <form action="admin">
+      <input class="dectnumber small" type="number" name="ban" required autofocus min="1" max="99999" placeholder="0000">
+      <input class="small" type="submit" value="Ban!">
+    </form>
+    <form action="admin">
+      <input class="dectnumber small" type="number" name="unban" required autofocus min="1" max="99999" placeholder="0000">
+      <input class="small" type="submit" value="Un-ban!">
+    </form>
+
+    <h2>Registered users</h2>
+    <a href="?showusers">Show registered users</a>
+    <p>{{ registered_numbers }}</p>
+  </section>
+  {{dump}}
+</body>
+</html>

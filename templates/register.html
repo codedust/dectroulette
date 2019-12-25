@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DECTroulette</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <section>
+    <img class="logo" src="static/dectroulette.svg">
+    <h1>Register for DECTroulette!</h1>
+
+    {% if unregister %}
+    <p class="success">Your number has been successfully unregistered. Your number will not be shown to other participants unless you register it again. In case of any abuse, we can also ban your number from further registrations. TODO</p>
+    {% endif %}
+
+    {% if error %}
+    <p class="error">ERROR: {{ error }}!</p>
+    {% endif %}
+
+    <p>Only phone numbers of registered users will be shown to other participants.</p>
+    <form action="roulette">
+      <p>Please enter your DECT number:</p>
+      <input class="dectnumber" type="number" name="d" required autofocus min="1" max="99999" placeholder="0000">
+      <input class="register" type="submit" value="Register!">
+    </form>
+  </section>
+</body>
+</html>

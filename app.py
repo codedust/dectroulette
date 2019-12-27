@@ -1,7 +1,9 @@
-from flask import Flask, request, render_template
+from flask import Flask, make_response, redirect, render_template, request, url_for
 from collections import deque
-import random
+import binascii
 import json
+import os
+import random
 
 app = Flask(__name__)
 
@@ -11,27 +13,42 @@ priority_queue     = deque() # queue of numbers that will be called next. If lis
 next_number_queue  = deque() # queue of numbers to call next. if empty, fill it up from last_active_numbers and registered_numbers
 
 try:
+    with open("admintoken.secret", "r") as file:
+        admin_token = file.readline()
+        print("admin token: " + admin_token)
+except IOError as e:
+    print("Creating admintoken.secret")
+    admin_token = binascii.hexlify(os.urandom(32))
+    with open("admintoken.secret", "w") as file:
+        file.write(admin_token)
+
+try:
     with open("data_file.json", "r") as file:
         print('loading data from backup file')
         data = json.load(file)
         registered_numbers = set(data["registered_numbers"])
         banned_numbers = set(data["banned_numbers"])
-except FileNotFoundError:
+except IOError:
     print("Backup file does not exist. No data has been loaded.")
 
 @app.route('/')
 def hello():
+    dectnumber = int(request.cookies.get('dectnumber', 0))
+    if dectnumber in range(1, 99999) and dectnumber not in banned_numbers:
+        return redirect(url_for('roulette'))
     return render_template('register.html')
 
-@app.route('/roulette')
+@app.route('/roulette', methods=['GET', 'POST'])
 def roulette():
     try:
-        dectnumber = int(request.args.get('d', 0))
+        dectnumber = int(request.form.get('d', 0))
+        if dectnumber == 0:
+            dectnumber = int(request.cookies.get('dectnumber', 0))
     except ValueError:
         return render_template('register.html', error = "invalid DECT number given")
 
     if dectnumber not in range(1, 99999):
-        return render_template('register.html', error = "invalid DECT number given")
+        return render_template('register.html', error = "DECT number out of range")
 
     if dectnumber in banned_numbers:
         return render_template('register.html', error = "this DECT number has been banned")
@@ -45,16 +62,18 @@ def roulette():
         if dectnumber not in priority_queue:
             priority_queue.append(dectnumber)
 
-    return render_template('roulette.html',
-                           own_number = dectnumber,
-                           partner_number = next_number(dectnumber),
-                           priority = dectnumber in priority_queue,
-                           active_users = len(registered_numbers))
+    resp = make_response(render_template('roulette.html',
+                                         own_number = dectnumber,
+                                         partner_number = next_number(dectnumber),
+                                         priority = dectnumber in priority_queue,
+                                         active_users = len(registered_numbers)))
+    resp.set_cookie('dectnumber', str(dectnumber))
+    return resp
 
 @app.route('/unregister')
 def unregister():
     try:
-        dectnumber = int(request.args.get('d', 0))
+        dectnumber = int(request.cookies.get('dectnumber', 0))
     except ValueError:
         return render_template('register.html', error = "invalid DECT number given")
 
@@ -71,17 +90,23 @@ def unregister():
     while(next_number_queue.count(dectnumber)):
         next_number_queue.remove(dectnumber)
 
-    return render_template('register.html', unregister = True)
+    resp = make_response(render_template('register.html', unregister = True))
+    resp.set_cookie('dectnumber', '', expires=0)
+    return resp
 
 @app.route('/admin')
 def admin():
+    token = request.args.get('token', None)
+    if token != admin_token:
+        return render_template('register.html', error  = "Invalid admin token")
+
     try:
         number_to_ban = int(request.args.get('ban', 0))
         if number_to_ban != 0:
             banned_numbers.add(number_to_ban)
             backup()
     except ValueError:
-        return render_template('admin.html', error = "invalid DECT number given", banned_numbers = sorted(banned_numbers))
+        return render_template('admin.html', error = "invalid DECT number given", admin_token = admin_token, banned_numbers = sorted(banned_numbers))
 
     try:
         number_to_unban = int(request.args.get('unban', 0))
@@ -89,12 +114,12 @@ def admin():
             banned_numbers.remove(number_to_unban)
             backup()
     except (ValueError, KeyError):
-        return render_template('admin.html', error = "invalid DECT number given", banned_numbers = sorted(banned_numbers))
+        return render_template('admin.html', error = "invalid DECT number given", admin_token = admin_token, banned_numbers = sorted(banned_numbers))
 
     if "showusers" in request.args:
-        return render_template('admin.html', banned_numbers = sorted(banned_numbers), registered_numbers = sorted(registered_numbers))
+        return render_template('admin.html', admin_token = admin_token, banned_numbers = sorted(banned_numbers), registered_numbers = sorted(registered_numbers))
 
-    return render_template('admin.html', banned_numbers = sorted(banned_numbers))
+    return render_template('admin.html', admin_token = admin_token, banned_numbers = sorted(banned_numbers))
 
 
 # ---- helper functions -----

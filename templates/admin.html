@@ -17,16 +17,18 @@
     <h2>Banned numbers</h2>
     <p>Banned numbers: {{ banned_numbers }}</p>
     <form action="admin">
+      <input type="hidden" name="token" value="{{ admin_token }}">
       <input class="dectnumber small" type="number" name="ban" required autofocus min="1" max="99999" placeholder="0000">
       <input class="small" type="submit" value="Ban!">
     </form>
     <form action="admin">
+      <input type="hidden" name="token" value="{{ admin_token }}">
       <input class="dectnumber small" type="number" name="unban" required autofocus min="1" max="99999" placeholder="0000">
       <input class="small" type="submit" value="Un-ban!">
     </form>
 
     <h2>Registered users</h2>
-    <a href="?showusers">Show registered users</a>
+    <a href="{{ url_for('admin', showusers=1, token=admin_token)}}">Show registered users</a>
     <p>{{ registered_numbers }}</p>
   </section>
   {{dump}}

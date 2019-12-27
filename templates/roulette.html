@@ -10,7 +10,7 @@
   <section>
     <img class="logo" src="static/dectroulette.svg">
     <h1>Let's talk!</h1>
-    <p>You're now registered to <span class="brand">DECTroulette</span>. Let's have a chat with someone else!</p>
+    <p>You're now registered to <span class="brand">DECTroulette</span>. Your number: {{own_number}}. Let's have a chat with someone else!</p>
 
     {% if error %}
     <p class="error">ERROR: {{ error }}!</p>
@@ -19,7 +19,7 @@
     <p>Here's the next DECT number you could call:</p>
 
     <p class="dectnumber">{{ partner_number }}</p>
-    <input type="submit" onClick="window.location.reload();" value="Next number">
+    <a href="{{ url_for('roulette') }}"><input type="button" value="Next number"></a>
 
     {% if priority %}
     <p>You're in the priority queue and will be called soon.<p>
@@ -31,7 +31,7 @@
     <p>There are currently {{ active_users }} registered users at <span class="brand">DECTroulette</span>.</p>
     {% endif %}
 
-    <p><a href="/unregister?d={{own_number}}">Unregister</a></p>
+    <p><a href="/unregister">Unregister</a></p>
   </section>
   <footer>
     Footer!

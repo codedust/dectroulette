@@ -3,7 +3,7 @@
 <section>
   <img class="logo" src="static/dectroulette.svg">
   <h1>Let's talk!</h1>
-  <p>You're now registered to <span class="brand">DECTroulette</span>. Your number: {{own_number}}. Let's have a chat with someone else!</p>
+  <p>You're now registered to <span class="brand">DECTroulette</span>. Your number: {{own_number}}. Let's have a conversation with someone else!</p>
 
   {% if error %}
   <p class="error">ERROR: {{ error }}!</p>
@@ -16,12 +16,14 @@
 
   {% if priority %}
   <p>You're in the priority queue and will be called soon.<p>
+  {% else %}
+  <p>You're <strong>not</strong> in the priority queue. <a href="/priority">Add me to the priority queue to receive one of the next calls.</a><p>
   {% endif %}
 
   {% if active_users == 1 %}
-  <p class="error">You are the only registered user for DECTroulette right now.<p>
+  <p class="error">You are the only registered user right now.<p>
   {% else %}
-  <p>There are currently {{ active_users }} registered users at <span class="brand">DECTroulette</span>.</p>
+  <p>There are currently {{ active_users }} registered users.</p>
   {% endif %}
 
   <p><a href="/unregister">Unregister</a></p>

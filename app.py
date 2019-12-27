@@ -94,6 +94,24 @@ def unregister():
     resp.set_cookie('dectnumber', '', expires=0)
     return resp
 
+@app.route('/priority')
+def priority():
+    try:
+        dectnumber = int(request.cookies.get('dectnumber', 0))
+    except ValueError:
+        return render_template('register.html', error = "invalid DECT number given")
+
+    if dectnumber not in range(1, 99999):
+        return render_template('register.html', error = "invalid DECT number given")
+
+    if dectnumber in banned_numbers:
+        return render_template('register.html', error = "this DECT number has been banned")
+
+    if dectnumber not in priority_queue:
+        priority_queue.append(dectnumber)
+
+    return redirect(url_for('roulette'))
+
 @app.route('/admin')
 def admin():
     token = request.args.get('token', None)
@@ -136,9 +154,9 @@ def next_number(own_number):
     if len(registered_numbers) <= 1:
         return '----'
 
-    try:
+    if (len(priority_queue) == 1 and priority_queue[0] != own_number) or len(priority_queue) > 1:
         partner_number = priority_queue.popleft()
-    except IndexError:
+    else:
         # if priority_queue is empty, use next_number_queue
         try:
             partner_number = next_number_queue.popleft()

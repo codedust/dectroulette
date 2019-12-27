@@ -87,6 +87,11 @@ p.dectnumber {
   text-shadow: 1px 1px black;
 }
 
+p.dectnumber a {
+  color: inherit;
+  text-decoration: none;
+}
+
 /* footer */
 footer {
   margin-top: 3em;

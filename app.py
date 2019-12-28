@@ -18,7 +18,7 @@ try:
         print("admin token: " + admin_token)
 except IOError as e:
     print("Creating admintoken.secret")
-    admin_token = binascii.hexlify(os.urandom(32))
+    admin_token = binascii.hexlify(os.urandom(32)).decode('ascii')
     with open("admintoken.secret", "w") as file:
         file.write(admin_token)
 
